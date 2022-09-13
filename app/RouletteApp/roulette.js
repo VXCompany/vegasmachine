@@ -5,7 +5,6 @@ var $inner = $('.inner'),
     $mask = $('.mask'),
     maskDefault = 'Place Your Bets',
     timer = 9000;
-showResult = 60000;
 
 var red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
 
@@ -32,14 +31,7 @@ function spinWheel() {
     
     $spin.addClass('disabled').prop('disabled', true);
 
-    // disable the reset button until the ball has stopped spinning
-    //$reset.addClass('disabled').prop('disabled','disabled').show();
-
     $('.placeholder').remove();
-
-    // setTimeout(function() {
-    //     $inner.attr('data-spinto','').removeClass('rest');
-    // }, 0)
 
     setTimeout(function () {
         $mask.text('No More Bets');
