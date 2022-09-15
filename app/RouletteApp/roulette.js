@@ -3,7 +3,7 @@ var $inner = $('.inner'),
     $spin = $('#spin'),
     $data = $('.data'),
     $mask = $('.mask'),
-    $competitors = $('.competitors').find('li'),
+    competitors = Array.from(document.querySelectorAll(".competitors li input")),
     maskDefault = 'Place Your Bets',
     timer = 9000;
 
@@ -16,17 +16,17 @@ $spin.on('click', function () {
 });
 
 function spinWheelWithWinner(winner) {
-
+    
 }
 
 function getRandomNumber() {
-    var y = $competitors.filter(x => x.text !== undefined);
-    if (!y) {
+    var spelers = competitors.filter((x) => x.value.length > 0).map(x => x.attributes['data-value'].value);
+   
+    if (!spelers.length) {
         return Math.floor(Math.random() * 34)
     } else {
-        var random = Math.random() * y.length;
-        console.log(y[random - 1]);
-        return y[random - 1].value;
+        var random = Math.floor(Math.random() * spelers.length);
+        return parseInt(spelers[random]);
     }
 }
 
@@ -76,7 +76,7 @@ function spinWheel() {
     }, timer);
 }
 
-const connection = new signalR.HubConnectionBuilder()
+/*const connection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:8080/vegasmachine")
     .configureLogging(signalR.LogLevel.Information)
     .build();
@@ -93,11 +93,12 @@ async function start() {
 
 connection.onclose(async () => {
     await start();
-});
+});*/
 
 // Start the connection.
-connection.start()
+//connection.start()
 
+/*
 connection.on("Spin", (message) => {
     spinWheel();
 });
@@ -105,5 +106,6 @@ connection.on("Spin", (message) => {
 connection.on("SpinWithWinner", (number) => {
     spinWheelWithWinner(number);
 });
+*/
 
 
