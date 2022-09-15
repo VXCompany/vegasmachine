@@ -38,7 +38,7 @@ app.MapHub<MainHub>("/vegasmachine");
 
 app.MapPost("/button-push", async () => {
     var hub = app.Services.GetRequiredService<IHubContext<MainHub>>();
-    await hub.Clients.All.SendAsync("ReceiveMessage", "button is pushed");
+    await hub.Clients.All.SendAsync("Spin");
     return Results.Ok();
 });
 

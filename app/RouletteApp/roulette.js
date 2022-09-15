@@ -88,7 +88,7 @@ connection.onclose(async () => {
 // Start the connection.
 connection.start()
 
-connection.on("ReceiveMessage", (message) => {
+connection.on("Spin", (message) => {
     spinWheel();
 });
 
