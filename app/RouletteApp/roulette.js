@@ -3,6 +3,7 @@ var $inner = $('.inner'),
     $spin = $('#spin'),
     $data = $('.data'),
     $mask = $('.mask'),
+    $competitors = $('.competitors').find('li'),
     maskDefault = 'Place Your Bets',
     timer = 9000;
 
@@ -18,11 +19,22 @@ function spinWheelWithWinner(winner) {
 
 }
 
+function getRandomNumber() {
+    var y = $competitors.filter(x => x.text !== undefined);
+    if (!y) {
+        return Math.floor(Math.random() * 34)
+    } else {
+        var random = Math.random() * y.length;
+        console.log(y[random - 1]);
+        return y[random - 1].value;
+    }
+}
+
 function spinWheel() {
     $inner.attr('data-spinto', '');
 
     // get a random number between 0 and 36 and apply it to the nth-child selector
-    var randomNumber = Math.floor(Math.random() * 34),
+    var randomNumber = getRandomNumber(),
         color = null;
 
     setTimeout(() => {
