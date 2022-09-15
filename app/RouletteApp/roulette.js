@@ -23,7 +23,7 @@ function getRandomNumber() {
     var spelers = competitors.filter((x) => x.value.length > 0).map(x => x.attributes['data-value'].value);
    
     if (!spelers.length) {
-        return Math.floor(Math.random() * 34)
+        return Math.floor(Math.random() * 36)
     } else {
         var random = Math.floor(Math.random() * spelers.length);
         return parseInt(spelers[random]);
