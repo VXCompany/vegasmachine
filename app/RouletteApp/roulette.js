@@ -15,61 +15,63 @@ $spin.on('click', function () {
     spinWheel();
 });
 
-function getRandomNumber() {
-    var spelers = competitors.filter((x) => x.value.length > 0).map(x => x.attributes['data-value'].value);
+function getWinningPlayer() {
+    var spelers = competitors.filter((x) => x.value.length > 0);
    
     if (!spelers.length) {
         return Math.floor(Math.random() * 36)
     } else {
         var random = Math.floor(Math.random() * spelers.length);
-        return parseInt(spelers[random]);
+        return spelers[random];
     }
 }
 
 function spinWheel() {
     $inner.attr('data-spinto', '');
+    $mask.text('No More Bets');
 
-    // get a random number between 0 and 36 and apply it to the nth-child selector
-    var randomNumber = getRandomNumber(),
-        color = null;
+    // Get the winning player
+    const winningPlayer = getWinningPlayer();
+    const numberOfWinningPlayer = winningPlayer.attributes['data-value'].value;
 
     setTimeout(() => {
-        $inner.attr('data-spinto', randomNumber);
+        $inner.attr('data-spinto',numberOfWinningPlayer );
     }, 0);
     
     $spin.addClass('disabled').prop('disabled', true);
 
     $('.placeholder').remove();
 
-    setTimeout(function () {
-        $mask.text('No More Bets');
-    }, timer / 2);
-
-    setTimeout(function () {
-        $mask.text(maskDefault);
-    }, timer + 500);
-
     // remove the disabled attribute when the ball has stopped
     setTimeout(function () {
         $spin.removeClass('disabled').prop('disabled', false);
+        color = null;
+        if ($.inArray(numberOfWinningPlayer, red) !== -1) { color = 'red' } else { color = 'black' };
+        if (numberOfWinningPlayer == 0) { color = 'green' };
 
-        if ($.inArray(randomNumber, red) !== -1) { color = 'red' } else { color = 'black' };
-        if (randomNumber == 0) { color = 'green' };
-
-        $('.result-number').text(randomNumber);
+        $('.result-number').text(numberOfWinningPlayer);
         $('.result-color').text(color);
         $('.result').css({ 'background-color': '' + color + '' });
         $data.addClass('reveal');
         $inner.addClass('rest');
 
-        $thisResult = '<li class="previous-result color-' + color + '"><span class="previous-number">' + randomNumber + '</span><span class="previous-color">' + color + '</span></li>';
+        $thisResult = '<li class="previous-result color-' + color + '"><span class="previous-number">' + numberOfWinningPlayer + '</span><span class="previous-color">' + color + '</span></li>';
 
         $('.previous-list').prepend($thisResult);
+        $mask.text(`The winner is ${winningPlayer.value}`);
 
         // we can enable here
         $data.removeClass('reveal');
         $inner.removeClass('rest');
+
+        //After 8 seconds, set the text back to the default
+        setTimeout(() => {
+            $mask.text(maskDefault);
+        }, 8000);
+
     }, timer);
+
+
 }
 
 const connection = new signalR.HubConnectionBuilder()
