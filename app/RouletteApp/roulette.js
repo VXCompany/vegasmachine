@@ -19,11 +19,11 @@ function getWinningPlayer() {
     var spelers = competitors.filter((x) => x.value.length > 0);
    
     if (!spelers.length) {
-        return Math.floor(Math.random() * 36)
-    } else {
-        var random = Math.floor(Math.random() * spelers.length);
-        return spelers[random];
+        return null;
     }
+
+    var random = Math.floor(Math.random() * spelers.length);
+    return spelers[random];
 }
 
 function spinWheel() {
@@ -32,7 +32,13 @@ function spinWheel() {
 
     // Get the winning player
     const winningPlayer = getWinningPlayer();
-    const numberOfWinningPlayer = winningPlayer.attributes['data-value'].value;
+    var numberOfWinningPlayer = null;
+    if(winningPlayer){
+        numberOfWinningPlayer = winningPlayer.attributes['data-value'].value;
+    } else {
+        numberOfWinningPlayer = Math.floor(Math.random() * 36);
+    }
+    
 
     setTimeout(() => {
         $inner.attr('data-spinto',numberOfWinningPlayer );
@@ -58,7 +64,12 @@ function spinWheel() {
         $thisResult = '<li class="previous-result color-' + color + '"><span class="previous-number">' + numberOfWinningPlayer + '</span><span class="previous-color">' + color + '</span></li>';
 
         $('.previous-list').prepend($thisResult);
-        $mask.text(`The winner is ${winningPlayer.value}`);
+        if(winningPlayer){
+            $mask.text(`The winner is ${winningPlayer.value}`);
+        } else {
+            $mask.text(`The winning number: ${numberOfWinningPlayer}`);
+        }
+        
 
         // we can enable here
         $data.removeClass('reveal');
