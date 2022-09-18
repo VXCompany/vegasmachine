@@ -5,7 +5,9 @@ var $inner = $('.inner'),
     $mask = $('.mask'),
     competitors = Array.from(document.querySelectorAll(".competitors li input")),
     maskDefault = 'Place Your Bets',
-    timer = 9000;
+    timer = 9000,
+    confettiDuration = 4000;
+    winnerDurationMessage = 8000;
 
 var red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
 
@@ -15,61 +17,75 @@ $spin.on('click', function () {
     spinWheel();
 });
 
-function getRandomNumber() {
-    var spelers = competitors.filter((x) => x.value.length > 0).map(x => x.attributes['data-value'].value);
+function getWinningPlayer() {
+    var spelers = competitors.filter((x) => x.value.length > 0);
    
     if (!spelers.length) {
-        return Math.floor(Math.random() * 36)
-    } else {
-        var random = Math.floor(Math.random() * spelers.length);
-        return parseInt(spelers[random]);
+        return null;
     }
+
+    var random = Math.floor(Math.random() * spelers.length);
+    return spelers[random];
 }
 
 function spinWheel() {
     $inner.attr('data-spinto', '');
+    $mask.text('No More Bets');
 
-    // get a random number between 0 and 36 and apply it to the nth-child selector
-    var randomNumber = getRandomNumber(),
-        color = null;
+    // Get the winning player
+    const winningPlayer = getWinningPlayer();
+    var numberOfWinningPlayer = null;
+    if(winningPlayer){
+        numberOfWinningPlayer = winningPlayer.attributes['data-value'].value;
+    } else {
+        numberOfWinningPlayer = Math.floor(Math.random() * 36);
+    }
+    
 
     setTimeout(() => {
-        $inner.attr('data-spinto', randomNumber);
+        $inner.attr('data-spinto',numberOfWinningPlayer );
     }, 0);
     
     $spin.addClass('disabled').prop('disabled', true);
 
     $('.placeholder').remove();
 
-    setTimeout(function () {
-        $mask.text('No More Bets');
-    }, timer / 2);
-
-    setTimeout(function () {
-        $mask.text(maskDefault);
-    }, timer + 500);
-
     // remove the disabled attribute when the ball has stopped
     setTimeout(function () {
         $spin.removeClass('disabled').prop('disabled', false);
+        color = null;
+        if ($.inArray(numberOfWinningPlayer, red) !== -1) { color = 'red' } else { color = 'black' };
+        if (numberOfWinningPlayer == 0) { color = 'green' };
 
-        if ($.inArray(randomNumber, red) !== -1) { color = 'red' } else { color = 'black' };
-        if (randomNumber == 0) { color = 'green' };
-
-        $('.result-number').text(randomNumber);
+        $('.result-number').text(numberOfWinningPlayer);
         $('.result-color').text(color);
         $('.result').css({ 'background-color': '' + color + '' });
         $data.addClass('reveal');
         $inner.addClass('rest');
 
-        $thisResult = '<li class="previous-result color-' + color + '"><span class="previous-number">' + randomNumber + '</span><span class="previous-color">' + color + '</span></li>';
+        $thisResult = '<li class="previous-result color-' + color + '"><span class="previous-number">' + numberOfWinningPlayer + '</span><span class="previous-color">' + color + '</span></li>';
 
+        window.confettiful = new Confettiful(document.querySelector('body'));
         $('.previous-list').prepend($thisResult);
+        if(winningPlayer){
+            $mask.text(`The winner is ${winningPlayer.value}`);
+        } else {
+            $mask.text(`The winning number: ${numberOfWinningPlayer}`);
+        }
+        
 
         // we can enable here
         $data.removeClass('reveal');
         $inner.removeClass('rest');
+
+        //After 8 seconds, set the text back to the default
+        setTimeout(() => {
+            $mask.text(maskDefault);
+        }, winnerDurationMessage);
+
     }, timer);
+
+
 }
 
 const connection = new signalR.HubConnectionBuilder()
@@ -99,4 +115,54 @@ connection.on("Spin", (message) => {
 });
 
 
+/** Methods for the confetti */
+const Confettiful = function(el) {
+    this.el = el;
+    this.containerEl = null;
+    
+    this.confettiFrequency = 100;
+    this.confettiColors = ['#fce18a', '#ff726d', '#b48def', '#f4306d'];
+    this.confettiAnimations = ['slow', 'medium', 'fast'];
+    
+    this._setupElements();
+    this._renderConfetti();
+  };
+  
+  Confettiful.prototype._setupElements = function() {
+    const containerEl = document.createElement('confetti-element');
+    const elPosition = this.el.style.position;
+    
+    if (elPosition !== 'relative' || elPosition !== 'absolute') {
+      this.el.style.position = 'relative';
+    }
+    
+    containerEl.classList.add('confetti-container');
+    
+    this.el.appendChild(containerEl);
+    
+    this.containerEl = containerEl;
 
+    setTimeout(() => {
+        containerEl.remove();
+    }, confettiDuration);
+    
+  };
+  
+  Confettiful.prototype._renderConfetti = function() {
+    this.confettiInterval = setInterval(() => {
+      const confettiEl = document.createElement('confetti-element');
+      const confettiSize = (Math.floor(Math.random() * 5) + 7) + 'px';
+      const confettiBackground = this.confettiColors[Math.floor(Math.random() * this.confettiColors.length)];
+      const confettiLeft = (Math.floor(Math.random() * this.el.offsetWidth)) + 'px';
+      const confettiAnimation = this.confettiAnimations[Math.floor(Math.random() * this.confettiAnimations.length)];
+      
+      confettiEl.classList.add('confetti', 'confetti--animation-' + confettiAnimation);
+      confettiEl.style.left = confettiLeft;
+      confettiEl.style.width = confettiSize;
+      confettiEl.style.height = confettiSize;
+      confettiEl.style.backgroundColor = confettiBackground;
+      
+      
+      this.containerEl.appendChild(confettiEl);
+    }, 10);
+  };
