@@ -35,7 +35,9 @@ function spinWheel() {
   const winningPlayer = getWinningPlayer();
   var numberOfWinningPlayer = null;
   if (winningPlayer) {
-    numberOfWinningPlayer = winningPlayer.attributes["data-value"].value;
+    numberOfWinningPlayer = parseInt(
+      winningPlayer.attributes["data-value"].value
+    );
   } else {
     numberOfWinningPlayer = Math.floor(Math.random() * 36);
   }
@@ -47,15 +49,13 @@ function spinWheel() {
   spin.classList.add("disabled");
   spin.disabled = true;
 
-  $(".placeholder").remove();
-
   // remove the disabled attribute when the ball has stopped
   setTimeout(function () {
     spin.classList.remove("disabled");
     spin.disabled = false;
 
     color = null;
-    if ($.inArray(numberOfWinningPlayer, red) !== -1) {
+    if (red.includes(numberOfWinningPlayer)) {
       color = "red";
     } else {
       color = "black";
@@ -64,23 +64,29 @@ function spinWheel() {
       color = "green";
     }
 
-    $(".result-number").text(numberOfWinningPlayer);
-    $(".result-color").text(color);
-    $(".result").css({ "background-color": "" + color + "" });
+    document.querySelectorAll(".result-number").innerHTML =
+      numberOfWinningPlayer;
+    document.querySelectorAll(".result-color").innerHTML = color;
+    document.querySelectorAll(".result")[0].style.backgroundColor = color;
+
     data.classList.add("reveal");
     inner.classList.add("rest");
 
-    $thisResult =
-      '<li class="previous-result color-' +
-      color +
-      '"><span class="previous-number">' +
-      numberOfWinningPlayer +
-      '</span><span class="previous-color">' +
-      color +
-      "</span></li>";
+    let thisResult = document.createElement("li");
+    thisResult.classList.add("previous-result");
+    thisResult.classList.add(`color-${color}`);
+    let thisResultName = document.createElement("span");
+    thisResultName.classList.add("previous-number");
+    thisResultName.innerHTML = numberOfWinningPlayer;
+    thisResult.appendChild(thisResultName);
+    let thisResultColor = document.createElement("span");
+    thisResultColor.classList.add("previous-color");
+    thisResultColor.innerHTML = color;
+    thisResult.appendChild(thisResultColor);
+    console.log(thisResult);
 
     window.confettiful = new Confettiful(document.querySelector("body"));
-    $(".previous-list").prepend($thisResult);
+    document.querySelectorAll(".previous-list")[0].prepend(thisResult);
     if (winningPlayer) {
       mask.innerHTML = `The winner is ${winningPlayer.value}`;
     } else {
