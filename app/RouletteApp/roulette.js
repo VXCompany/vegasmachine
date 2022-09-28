@@ -1,5 +1,5 @@
-﻿var inner = document.querySelectorAll(".inner")[0],
-  $spin = $("#spin"),
+﻿var inner = document.getElementById("inner"),
+  spin = document.getElementById("spin"),
   $data = $(".data"),
   $mask = $(".mask"),
   competitors = Array.from(document.querySelectorAll(".competitors li input")),
@@ -12,9 +12,9 @@ var red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
 
 $mask.text(maskDefault);
 
-$spin.on("click", function () {
+spin.onclick = function () {
   spinWheel();
-});
+};
 
 function getWinningPlayer() {
   var spelers = competitors.filter((x) => x.value.length > 0);
@@ -44,13 +44,16 @@ function spinWheel() {
     inner.setAttribute("data-spinto", numberOfWinningPlayer);
   }, 0);
 
-  $spin.addClass("disabled").prop("disabled", true);
+  spin.classList.add("disabled");
+  spin.disabled = true;
 
   $(".placeholder").remove();
 
   // remove the disabled attribute when the ball has stopped
   setTimeout(function () {
-    $spin.removeClass("disabled").prop("disabled", false);
+    spin.classList.remove("disabled");
+    spin.disabled = false;
+
     color = null;
     if ($.inArray(numberOfWinningPlayer, red) !== -1) {
       color = "red";
