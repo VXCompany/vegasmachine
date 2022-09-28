@@ -491,7 +491,7 @@ body {
     transform: rotateZ(360deg);
   }
 }
-.data {
+#data {
   display: block;
   position: absolute;
   top: 30%;
@@ -503,7 +503,7 @@ body {
   perspective: 2000px;
   z-index: 100;
 }
-.data .data-inner {
+#data .data-inner {
   position: relative;
   width: 100%;
   height: 100%;
@@ -511,11 +511,11 @@ body {
   transition: transform 0.72s;
   transform-style: preserve-3d;
 }
-.data.reveal .data-inner {
+#data.reveal .data-inner {
   transform: rotateY(180deg);
 }
-.data .mask,
-.data .result {
+#data #mask,
+#data .result {
   top: 0;
   right: 0;
   bottom: 0;
@@ -527,27 +527,27 @@ body {
   overflow: hidden;
   display: inline-block;
 }
-.data .mask {
+#data #mask {
   color: #fff;
   font-size: 24px;
   margin: auto;
   line-height: 1.4;
   padding-top: 36px;
 }
-.data .result {
+#data .result {
   background-color: green;
   color: white;
   transform: rotateY(180deg);
   align-items: center;
   color: #fff;
 }
-.data .result-number {
+#data .result-number {
   font-size: 72px;
   font-weight: 500;
   line-height: 1.2;
   margin-top: 12px;
 }
-.data .result-color {
+#data .result-color {
   text-transform: uppercase;
   font-size: 21px;
   line-height: 1;

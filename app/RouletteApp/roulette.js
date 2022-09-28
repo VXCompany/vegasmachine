@@ -1,7 +1,7 @@
 ﻿var inner = document.getElementById("inner"),
   spin = document.getElementById("spin"),
-  $data = $(".data"),
-  $mask = $(".mask"),
+  data = document.getElementById("data"),
+  mask = document.getElementById("mask"),
   competitors = Array.from(document.querySelectorAll(".competitors li input")),
   maskDefault = "Place Your Bets",
   timer = 9000,
@@ -10,7 +10,7 @@ winnerDurationMessage = 8000;
 
 var red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
 
-$mask.text(maskDefault);
+mask.innerHTML = maskDefault;
 
 spin.onclick = function () {
   spinWheel();
@@ -29,7 +29,7 @@ function getWinningPlayer() {
 
 function spinWheel() {
   inner.setAttribute("data-spinto", "");
-  $mask.text("No More Bets");
+  mask.innerHTML = "No More Bets";
 
   // Get the winning player
   const winningPlayer = getWinningPlayer();
@@ -67,7 +67,7 @@ function spinWheel() {
     $(".result-number").text(numberOfWinningPlayer);
     $(".result-color").text(color);
     $(".result").css({ "background-color": "" + color + "" });
-    $data.addClass("reveal");
+    data.classList.add("reveal");
     inner.classList.add("rest");
 
     $thisResult =
@@ -82,18 +82,18 @@ function spinWheel() {
     window.confettiful = new Confettiful(document.querySelector("body"));
     $(".previous-list").prepend($thisResult);
     if (winningPlayer) {
-      $mask.text(`The winner is ${winningPlayer.value}`);
+      mask.innerHTML = `The winner is ${winningPlayer.value}`;
     } else {
-      $mask.text(`The winning number: ${numberOfWinningPlayer}`);
+      mask.innerHTML = `The winning number: ${numberOfWinningPlayer}`;
     }
 
     // we can enable here
-    $data.removeClass("reveal");
+    data.classList.remove("reveal");
     inner.classList.remove("rest");
 
     //After 8 seconds, set the text back to the default
     setTimeout(() => {
-      $mask.text(maskDefault);
+      mask.innerHTML = maskDefault;
     }, winnerDurationMessage);
   }, timer);
 }
