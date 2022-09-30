@@ -1,14 +1,69 @@
-﻿var inner = document.getElementById("inner"),
+﻿class Wheel {
+  spin() {}
+}
+
+class Mask {}
+
+class WinnerList {
+  addWinner(winner) {}
+}
+
+class Players {
+  competitors = Array.from(document.querySelectorAll(".competitors li input"));
+
+  decideWinner() {
+    var spelers = this.competitors.filter((x) => x.value.length > 0);
+
+    if (!spelers.length) {
+      var winningNumber = Math.floor(Math.random() * 36);
+      var winnerMessage = `The winning number: ${winningNumber}`;
+
+      return new Winner(winningNumber, winnerMessage);
+    }
+
+    var random = Math.floor(Math.random() * spelers.length);
+    const winner = spelers[random];
+    var winningNumber = parseInt(winner.attributes["data-value"].value);
+    var winnerMessage = `The winner is ${winner.value}`;
+
+    return new Winner(winningNumber, winnerMessage);
+  }
+}
+
+class Winner {
+  number;
+  message;
+  color;
+
+  red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
+
+  deductColor(number) {
+    if (number == 0) {
+      return "green";
+    } else if (this.red.includes(number)) {
+      return "red";
+    } else {
+      return "black";
+    }
+  }
+
+  constructor(number, message) {
+    this.number = number;
+    this.message = message;
+    this.color = this.deductColor(number);
+  }
+}
+
+var inner = document.getElementById("inner"),
   spin = document.getElementById("spin"),
   data = document.getElementById("data"),
   mask = document.getElementById("mask"),
-  competitors = Array.from(document.querySelectorAll(".competitors li input")),
   maskDefault = "Place Your Bets",
-  timer = 9000,
-  confettiDuration = 4000;
-winnerDurationMessage = 8000;
+  timer = 9000;
+var confettiDuration = 4000,
+  winnerDurationMessage = 8000;
 
-var red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
+const players = new Players();
 
 mask.innerHTML = maskDefault;
 
@@ -16,34 +71,14 @@ spin.onclick = function () {
   spinWheel();
 };
 
-function getWinningPlayer() {
-  var spelers = competitors.filter((x) => x.value.length > 0);
-
-  if (!spelers.length) {
-    return null;
-  }
-
-  var random = Math.floor(Math.random() * spelers.length);
-  return spelers[random];
-}
-
 function spinWheel() {
   inner.setAttribute("data-spinto", "");
   mask.innerHTML = "No More Bets";
 
-  // Get the winning player
-  const winningPlayer = getWinningPlayer();
-  var numberOfWinningPlayer = null;
-  if (winningPlayer) {
-    numberOfWinningPlayer = parseInt(
-      winningPlayer.attributes["data-value"].value
-    );
-  } else {
-    numberOfWinningPlayer = Math.floor(Math.random() * 36);
-  }
+  const winner = players.decideWinner();
 
   setTimeout(() => {
-    inner.setAttribute("data-spinto", numberOfWinningPlayer);
+    inner.setAttribute("data-spinto", winner.number);
   }, 0);
 
   spin.classList.add("disabled");
@@ -54,44 +89,29 @@ function spinWheel() {
     spin.classList.remove("disabled");
     spin.disabled = false;
 
-    color = null;
-    if (red.includes(numberOfWinningPlayer)) {
-      color = "red";
-    } else {
-      color = "black";
-    }
-    if (numberOfWinningPlayer == 0) {
-      color = "green";
-    }
-
-    document.querySelectorAll(".result-number").innerHTML =
-      numberOfWinningPlayer;
-    document.querySelectorAll(".result-color").innerHTML = color;
-    document.querySelectorAll(".result")[0].style.backgroundColor = color;
+    document.querySelectorAll(".result-number").innerHTML = winner.number;
+    document.querySelectorAll(".result-color").innerHTML = winner.color;
+    document.querySelectorAll(".result")[0].style.backgroundColor =
+      winner.color;
 
     data.classList.add("reveal");
     inner.classList.add("rest");
 
     let thisResult = document.createElement("li");
     thisResult.classList.add("previous-result");
-    thisResult.classList.add(`color-${color}`);
+    thisResult.classList.add(`color-${winner.color}`);
     let thisResultName = document.createElement("span");
     thisResultName.classList.add("previous-number");
-    thisResultName.innerHTML = numberOfWinningPlayer;
+    thisResultName.innerHTML = winner.number;
     thisResult.appendChild(thisResultName);
     let thisResultColor = document.createElement("span");
     thisResultColor.classList.add("previous-color");
-    thisResultColor.innerHTML = color;
+    thisResultColor.innerHTML = winner.color;
     thisResult.appendChild(thisResultColor);
-    console.log(thisResult);
 
     window.confettiful = new Confettiful(document.querySelector("body"));
     document.querySelectorAll(".previous-list")[0].prepend(thisResult);
-    if (winningPlayer) {
-      mask.innerHTML = `The winner is ${winningPlayer.value}`;
-    } else {
-      mask.innerHTML = `The winning number: ${numberOfWinningPlayer}`;
-    }
+    mask.innerHTML = winner.message;
 
     // we can enable here
     data.classList.remove("reveal");
