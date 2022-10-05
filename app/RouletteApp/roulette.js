@@ -1,11 +1,47 @@
-﻿class Wheel {
-  spin() {}
+﻿class Mask {
+  mask = document.getElementById("mask");
+  data = document.getElementById("data");
+  maskDefault = "Place Your Bets";
+  winnerList = new WinnerList();
+
+  set(text) {
+    this.mask.innerHTML = text;
+  }
+
+  revealWinner(winner) {
+    document.querySelectorAll(".result-number").innerHTML = winner.number;
+    document.querySelectorAll(".result-color").innerHTML = winner.color;
+    document.querySelectorAll(".result")[0].style.backgroundColor =
+      winner.color;
+
+    this.winnerList.addWinner(winner);
+  }
+
+  setDefault() {
+    this.set(this.maskDefault);
+  }
+
+  constructor() {
+    this.setDefault();
+  }
 }
 
-class Mask {}
-
 class WinnerList {
-  addWinner(winner) {}
+  addWinner(winner) {
+    let thisResult = document.createElement("li");
+    thisResult.classList.add("previous-result");
+    thisResult.classList.add(`color-${winner.color}`);
+    let thisResultName = document.createElement("span");
+    thisResultName.classList.add("previous-number");
+    thisResultName.innerHTML = winner.number;
+    thisResult.appendChild(thisResultName);
+    let thisResultColor = document.createElement("span");
+    thisResultColor.classList.add("previous-color");
+    thisResultColor.innerHTML = winner.color;
+    thisResult.appendChild(thisResultColor);
+
+    document.querySelectorAll(".previous-list")[0].prepend(thisResult);
+  }
 }
 
 class Players {
@@ -35,12 +71,14 @@ class Winner {
   message;
   color;
 
-  red = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
-
   deductColor(number) {
+    const red = [
+      32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3,
+    ];
+
     if (number == 0) {
       return "green";
-    } else if (this.red.includes(number)) {
+    } else if (red.includes(number)) {
       return "red";
     } else {
       return "black";
@@ -57,61 +95,45 @@ class Winner {
 var inner = document.getElementById("inner"),
   spin = document.getElementById("spin"),
   data = document.getElementById("data"),
-  mask = document.getElementById("mask"),
-  maskDefault = "Place Your Bets",
   timer = 9000;
 var confettiDuration = 4000,
-  winnerDurationMessage = 8000;
+  winnerDurationMessage = 4000;
 
 const players = new Players();
-
-mask.innerHTML = maskDefault;
+const mask = new Mask();
 
 spin.onclick = function () {
   spinWheel();
 };
 
 function spinWheel() {
-  inner.setAttribute("data-spinto", "");
-  mask.innerHTML = "No More Bets";
+  //pre
+  setTimeout(() => {
+    inner.setAttribute("data-spinto", "");
+  }, 0);
 
+  mask.set("No More Bets");
+
+  //roll
   const winner = players.decideWinner();
 
+  //display winner
   setTimeout(() => {
     inner.setAttribute("data-spinto", winner.number);
-  }, 0);
+  }, 10);
 
   spin.classList.add("disabled");
   spin.disabled = true;
 
-  // remove the disabled attribute when the ball has stopped
   setTimeout(function () {
-    spin.classList.remove("disabled");
-    spin.disabled = false;
+    mask.prePareShowWinner;
+    mask.revealWinner(winner);
 
-    document.querySelectorAll(".result-number").innerHTML = winner.number;
-    document.querySelectorAll(".result-color").innerHTML = winner.color;
-    document.querySelectorAll(".result")[0].style.backgroundColor =
-      winner.color;
-
-    data.classList.add("reveal");
     inner.classList.add("rest");
-
-    let thisResult = document.createElement("li");
-    thisResult.classList.add("previous-result");
-    thisResult.classList.add(`color-${winner.color}`);
-    let thisResultName = document.createElement("span");
-    thisResultName.classList.add("previous-number");
-    thisResultName.innerHTML = winner.number;
-    thisResult.appendChild(thisResultName);
-    let thisResultColor = document.createElement("span");
-    thisResultColor.classList.add("previous-color");
-    thisResultColor.innerHTML = winner.color;
-    thisResult.appendChild(thisResultColor);
+    data.classList.add("reveal");
 
     window.confettiful = new Confettiful(document.querySelector("body"));
-    document.querySelectorAll(".previous-list")[0].prepend(thisResult);
-    mask.innerHTML = winner.message;
+    mask.set(winner.message);
 
     // we can enable here
     data.classList.remove("reveal");
@@ -119,13 +141,15 @@ function spinWheel() {
 
     //After 8 seconds, set the text back to the default
     setTimeout(() => {
-      mask.innerHTML = maskDefault;
+      mask.setDefault();
+      spin.classList.remove("disabled");
+      spin.disabled = false;
     }, winnerDurationMessage);
   }, timer);
 }
 
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl("http://localhost:8080/vegasmachine")
+  .withUrl("https://localhost:5001/vegasmachine")
   .configureLogging(signalR.LogLevel.Information)
   .build();
 
