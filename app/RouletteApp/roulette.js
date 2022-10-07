@@ -135,9 +135,10 @@ class Button {
   }
 }
 
-var timer = 9000;
-var confettiDuration = 4000,
-  winnerDurationMessage = 4000;
+const timer = 9000;
+const confettiDuration = 4000;
+const winnerDurationMessage = 4000;
+const magicTimeoutThatMakesEverythingRight = 50;
 
 const players = new Players();
 const mask = new Mask();
@@ -149,18 +150,14 @@ spin.onclick = function () {
 };
 
 function spinWheel() {
-  //pre
   wheel.setup();
   mask.set("No More Bets");
   button.disable();
   setTimeout(() => {
-    //roll
     const winner = players.pickWinningPlayer();
-
-    //display winner
     wheel.spinToWinner(winner);
 
-    setTimeout(function () {
+    setTimeout(() => {
       mask.revealWinner(winner);
       window.confettiful = new Confettiful(document.querySelector("body"));
 
@@ -174,7 +171,7 @@ function spinWheel() {
         button.enable();
       }, winnerDurationMessage);
     }, timer);
-  }, 50);
+  }, magicTimeoutThatMakesEverythingRight);
 }
 
 const connection = new signalR.HubConnectionBuilder()
