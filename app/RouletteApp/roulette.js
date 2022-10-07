@@ -17,6 +17,10 @@
     this.winnerList.addWinner(winner);
   }
 
+  showWinnerMessage() {
+    data.classList.add("reveal");
+  }
+
   setDefault() {
     this.set(this.maskDefault);
   }
@@ -47,7 +51,7 @@ class WinnerList {
 class Players {
   competitors = Array.from(document.querySelectorAll(".competitors li input"));
 
-  decideWinner() {
+  pickWinningPlayer() {
     var spelers = this.competitors.filter((x) => x.value.length > 0);
 
     if (!spelers.length) {
@@ -92,6 +96,36 @@ class Winner {
   }
 }
 
+class Wheel {
+  inner = document.getElementById("inner");
+
+  constructor() {
+    setTimeout(() => {
+      this.inner.setAttribute("data-spinto", "");
+    }, 0);
+  }
+
+  displayWinner(winner) {
+    setTimeout(() => {
+      inner.setAttribute("data-spinto", winner.number);
+    }, 0);
+  }
+}
+
+class Button {
+  spin = document.getElementById("spin");
+
+  enable() {
+    spin.classList.remove("disabled");
+    spin.disabled = false;
+  }
+
+  disable() {
+    spin.classList.add("disabled");
+    spin.disabled = true;
+  }
+}
+
 var inner = document.getElementById("inner"),
   spin = document.getElementById("spin"),
   data = document.getElementById("data"),
@@ -101,6 +135,8 @@ var confettiDuration = 4000,
 
 const players = new Players();
 const mask = new Mask();
+const button = new Button();
+let wheel = new Wheel();
 
 spin.onclick = function () {
   spinWheel();
@@ -108,29 +144,21 @@ spin.onclick = function () {
 
 function spinWheel() {
   //pre
-  setTimeout(() => {
-    inner.setAttribute("data-spinto", "");
-  }, 0);
-
+  wheel = new Wheel();
   mask.set("No More Bets");
+  button.disable();
 
   //roll
-  const winner = players.decideWinner();
+  const winner = players.pickWinningPlayer();
 
   //display winner
-  setTimeout(() => {
-    inner.setAttribute("data-spinto", winner.number);
-  }, 10);
-
-  spin.classList.add("disabled");
-  spin.disabled = true;
+  wheel.displayWinner(winner);
 
   setTimeout(function () {
-    mask.prePareShowWinner;
     mask.revealWinner(winner);
 
     inner.classList.add("rest");
-    data.classList.add("reveal");
+    mask.showWinnerMessage();
 
     window.confettiful = new Confettiful(document.querySelector("body"));
     mask.set(winner.message);
@@ -142,10 +170,11 @@ function spinWheel() {
     //After 8 seconds, set the text back to the default
     setTimeout(() => {
       mask.setDefault();
-      spin.classList.remove("disabled");
-      spin.disabled = false;
+      spin.enable();
     }, winnerDurationMessage);
   }, timer);
+
+  setTimeout(function () {});
 }
 
 const connection = new signalR.HubConnectionBuilder()
