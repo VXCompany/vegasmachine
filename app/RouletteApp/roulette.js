@@ -15,10 +15,14 @@
       winner.color;
 
     this.winnerList.addWinner(winner);
+
+    data.classList.add("reveal");
+
+    this.set(winner.message);
   }
 
-  showWinnerMessage() {
-    data.classList.add("reveal");
+  flip() {
+    data.classList.remove("reveal");
   }
 
   setDefault() {
@@ -99,16 +103,21 @@ class Winner {
 class Wheel {
   inner = document.getElementById("inner");
 
-  constructor() {
-    setTimeout(() => {
-      this.inner.setAttribute("data-spinto", "");
-    }, 0);
+  constructor() {}
+
+  setup() {
+    // setTimeout(() => {
+    this.inner.setAttribute("data-spinto", "");
+    inner.classList.remove("rest");
+    // }, 0);
   }
 
-  displayWinner(winner) {
-    setTimeout(() => {
-      inner.setAttribute("data-spinto", winner.number);
-    }, 0);
+  spinToWinner(winner) {
+    inner.setAttribute("data-spinto", winner.number);
+  }
+
+  rest() {
+    inner.classList.add("rest");
   }
 }
 
@@ -126,17 +135,14 @@ class Button {
   }
 }
 
-var inner = document.getElementById("inner"),
-  spin = document.getElementById("spin"),
-  data = document.getElementById("data"),
-  timer = 9000;
+var timer = 9000;
 var confettiDuration = 4000,
   winnerDurationMessage = 4000;
 
 const players = new Players();
 const mask = new Mask();
 const button = new Button();
-let wheel = new Wheel();
+const wheel = new Wheel();
 
 spin.onclick = function () {
   spinWheel();
@@ -144,40 +150,35 @@ spin.onclick = function () {
 
 function spinWheel() {
   //pre
-  wheel = new Wheel();
+  wheel.setup();
   mask.set("No More Bets");
   button.disable();
+  setTimeout(() => {
+    //roll
+    const winner = players.pickWinningPlayer();
 
-  //roll
-  const winner = players.pickWinningPlayer();
+    //display winner
+    wheel.spinToWinner(winner);
 
-  //display winner
-  wheel.displayWinner(winner);
+    setTimeout(function () {
+      mask.revealWinner(winner);
+      window.confettiful = new Confettiful(document.querySelector("body"));
 
-  setTimeout(function () {
-    mask.revealWinner(winner);
+      // we can enable here
+      data.classList.remove("reveal");
+      wheel.rest();
 
-    inner.classList.add("rest");
-    mask.showWinnerMessage();
-
-    window.confettiful = new Confettiful(document.querySelector("body"));
-    mask.set(winner.message);
-
-    // we can enable here
-    data.classList.remove("reveal");
-    inner.classList.remove("rest");
-
-    //After 8 seconds, set the text back to the default
-    setTimeout(() => {
-      mask.setDefault();
-      spin.enable();
-    }, winnerDurationMessage);
-  }, timer);
-
-  setTimeout(function () {});
+      //After 8 seconds, set the text back to the default
+      setTimeout(() => {
+        mask.setDefault();
+        button.enable();
+      }, winnerDurationMessage);
+    }, timer);
+  }, 50);
 }
 
 const connection = new signalR.HubConnectionBuilder()
+  // .withUrl("http://localhost:8080/vegasmachine")
   .withUrl("https://localhost:5001/vegasmachine")
   .configureLogging(signalR.LogLevel.Information)
   .build();
