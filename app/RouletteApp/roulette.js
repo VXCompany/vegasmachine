@@ -175,8 +175,7 @@ function spinWheel() {
 }
 
 const connection = new signalR.HubConnectionBuilder()
-  // .withUrl("http://localhost:8080/vegasmachine")
-  .withUrl("https://localhost:5001/vegasmachine")
+  .withUrl("http://localhost:8080/vegasmachine")
   .configureLogging(signalR.LogLevel.Information)
   .build();
 
