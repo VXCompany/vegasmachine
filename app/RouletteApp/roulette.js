@@ -145,6 +145,7 @@ const mask = new Mask();
 const button = new Button();
 const wheel = new Wheel();
 
+
 spin.onclick = function () {
   spinWheel();
 };
@@ -174,6 +175,7 @@ function spinWheel() {
   }, magicTimeoutThatMakesEverythingRight);
 }
 
+/*
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("http://localhost:8080/vegasmachine")
   .configureLogging(signalR.LogLevel.Information)
@@ -193,12 +195,13 @@ connection.onclose(async () => {
   await start();
 });
 
-// Start the connection.
+Start the connection.
 connection.start();
 
 connection.on("Spin", (message) => {
   spinWheel();
 });
+*/
 
 /** Methods for the confetti */
 const Confettiful = function (el) {

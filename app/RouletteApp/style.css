@@ -450,7 +450,7 @@ body {
   font-size: 15px;
   width: 175px;
   padding: 12px;
-  margin: 10px 10px 10px 95px;
+  margin: 10px 10px 10px 10px;
   cursor: pointer;
   color: #fff;
   font-family: "Roboto", sans-serif;
@@ -683,4 +683,8 @@ body {
 }
 .confetti--animation-fast {
   animation: confetti-fast 1.25s linear 1 forwards;
+}
+
+.controls {
+  display: flex;
 }
